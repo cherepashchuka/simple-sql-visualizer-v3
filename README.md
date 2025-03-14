@@ -70,5 +70,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📧 Contact
 
-Andrei Cherepashchuk - [@telegram(https://t.me/chereav) - justwinkyy@gmail.com
+Andrei Cherepashchuk - [@telegram](https://t.me/chereav) - justwinkyy@gmail.com
 
