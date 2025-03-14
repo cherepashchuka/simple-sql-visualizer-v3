@@ -1,5 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Spinner } from 'react-bootstrap';
+import { 
+  Container, 
+  Grid, 
+  Paper, 
+  Typography, 
+  Box, 
+  CircularProgress, 
+  Alert, 
+  AlertTitle 
+} from '@mui/material';
 import TableEditor from './components/TableEditor';
 import CodeEditor from './components/CodeEditor';
 import AnimationDisplay from './components/AnimationDisplay';
@@ -7,7 +16,6 @@ import { Table, Action } from './types';
 import { parseCode } from './utils/parser';
 import { generateGif } from './utils/gifGenerator';
 import { saveTables, loadTables } from './utils/storage';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { v4 as uuidv4 } from 'uuid';
 
 const App = () => {
@@ -73,15 +81,17 @@ const App = () => {
   };
 
   return (
-    <Container fluid className="p-4">
-      <h1 className="mb-4">SQL Visualizer</h1>
+    <Container maxWidth="xl" sx={{ py: 4 }}>
+      <Typography variant="h3" component="h1" gutterBottom sx={{ mb: 4, fontWeight: 'bold' }}>
+        SQL Visualizer
+      </Typography>
       
-      <Row>
-        <Col md={6} className="mb-4">
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={6}>
           <TableEditor tables={tables} setTables={handleUpdateTables} />
-        </Col>
+        </Grid>
         
-        <Col md={6}>
+        <Grid item xs={12} md={6}>
           <CodeEditor 
             code={code} 
             setCode={setCode} 
@@ -89,24 +99,22 @@ const App = () => {
           />
           
           {error && (
-            <Card className="mb-4 bg-danger text-white">
-              <Card.Body>
-                <Card.Title>Error</Card.Title>
-                <Card.Text>{error}</Card.Text>
-              </Card.Body>
-            </Card>
+            <Alert severity="error" sx={{ mb: 3 }}>
+              <AlertTitle>Error</AlertTitle>
+              {error}
+            </Alert>
           )}
           
           {isGenerating ? (
-            <Card>
-              <Card.Body className="text-center p-5">
-                <Spinner animation="border" role="status" variant="primary">
-                  <span className="visually-hidden">Loading...</span>
-                </Spinner>
-                <p className="mt-3">Generating animation...</p>
-                <p className="text-muted small">This might take a few moments, especially for complex tables</p>
-              </Card.Body>
-            </Card>
+            <Paper sx={{ p: 5, textAlign: 'center' }}>
+              <CircularProgress />
+              <Typography variant="body1" sx={{ mt: 2 }}>
+                Generating animation...
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                This might take a few moments, especially for complex tables
+              </Typography>
+            </Paper>
           ) : actions.length > 0 && (
             <AnimationDisplay 
               tables={tables}
@@ -123,8 +131,14 @@ const App = () => {
               onGenerateGif={handleExecute}
             />
           )}
-        </Col>
-      </Row>
+        </Grid>
+      </Grid>
+      
+      <Box sx={{ mt: 6, pt: 3, borderTop: '1px solid #e2e8f0', textAlign: 'center' }}>
+        <Typography variant="body2" color="text.secondary">
+          SQL Visualizer - Open Source Project
+        </Typography>
+      </Box>
     </Container>
   );
 };

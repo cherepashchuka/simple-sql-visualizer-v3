@@ -1,47 +1,79 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Button, Table, ButtonGroup, Form, Row, Col } from 'react-bootstrap';
-import styled from 'styled-components';
+import { 
+  Paper,
+  Typography,
+  Button,
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Slider,
+  Grid,
+  TextField,
+  Stack,
+  ButtonGroup,
+  Chip,
+  IconButton,
+  styled,
+  Card,
+  CardContent,
+  Divider,
+  Alert
+} from '@mui/material';
 import { Table as TableType } from '../types';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
+import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
+import SkipNextIcon from '@mui/icons-material/SkipNext';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import MovieIcon from '@mui/icons-material/Movie';
+import SettingsIcon from '@mui/icons-material/Settings';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import DownloadIcon from '@mui/icons-material/Download';
 
-const AnimationContainer = styled.div`
-  margin-bottom: 20px;
-`;
+const HeaderBox = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(2),
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.primary.contrastText,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+}));
 
-const StyledTable = styled(Table)`
-  margin-bottom: 0;
-`;
+const HighlightedCell = styled(TableCell)(({ theme }) => ({
+  backgroundColor: theme.palette.warning.light + ' !important',
+  transition: 'background-color 0.3s ease',
+}));
 
-const HighlightedCell = styled.td`
-  background-color: #ffc107 !important;
-  transition: background-color 0.3s ease;
-`;
-
-const HighlightedRow = styled.tr`
-  background-color: #ffc107 !important;
-  transition: background-color 0.3s ease;
-`;
-
-const HighlightedHeader = styled.th`
-  background-color: #ffc107 !important;
-  transition: background-color 0.3s ease;
-`;
-
-const GifContainer = styled.div`
-  margin-top: 20px;
-  text-align: center;
-  
-  img {
-    max-width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+const HighlightedRow = styled(TableRow)(({ theme }) => ({
+  '& > td': {
+    backgroundColor: theme.palette.warning.light + ' !important',
+    transition: 'background-color 0.3s ease',
   }
-`;
+}));
 
-const AnimationControls = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-`;
+const HighlightedHeader = styled(TableCell)(({ theme }) => ({
+  backgroundColor: theme.palette.warning.light + ' !important',
+  transition: 'background-color 0.3s ease',
+}));
+
+const GifContainer = styled(Box)(({ theme }) => ({
+  marginTop: theme.spacing(3),
+  textAlign: 'center',
+  '& img': {
+    maxWidth: '100%',
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: theme.shape.borderRadius,
+  }
+}));
+
+const AnimationControls = styled(Box)(({ theme }) => ({
+  marginBottom: theme.spacing(3),
+}));
 
 interface AnimationDisplayProps {
   tables: TableType[];
@@ -65,7 +97,7 @@ const AnimationDisplay: React.FC<AnimationDisplayProps> = ({
   const [currentFrameIndex, setCurrentFrameIndex] = useState(initialFrameIndex);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControls, setShowControls] = useState(true);
-  const [frameDelay, setFrameDelay] = useState(200); // Default: 200ms (0.2 seconds)
+  const [frameDelay, setFrameDelay] = useState(200); // Default: 200ms
 
   const currentFrame = animationFrames[currentFrameIndex] || null;
   const totalFrames = animationFrames.length;
@@ -151,104 +183,133 @@ const AnimationDisplay: React.FC<AnimationDisplayProps> = ({
     return false;
   };
 
+  const speedText = frameDelay < 200 ? 'Fast' : frameDelay < 500 ? 'Medium' : 'Slow';
+
   return (
-    <AnimationContainer>
-      <Card>
-        <Card.Header className="d-flex justify-content-between align-items-center">
-          <h4>Animation Result</h4>
-          {showControls && animationFrames.length > 1 && (
-            <Button 
-              variant="outline-primary" 
-              size="sm"
-              onClick={() => setShowControls(false)}
-            >
-              Hide Controls
-            </Button>
-          )}
-          {!showControls && animationFrames.length > 1 && (
-            <Button 
-              variant="outline-primary" 
-              size="sm"
-              onClick={() => setShowControls(true)}
-            >
-              Show Controls
-            </Button>
-          )}
-        </Card.Header>
-        <Card.Body>
-          {showControls && animationFrames.length > 1 && (
-            <AnimationControls>
-              <Card style={{ width: '100%', maxWidth: '500px' }}>
-                <Card.Body className="p-3">
-                  <div className="d-flex align-items-center mb-2">
-                    <span>Frame: {currentFrameIndex + 1}/{totalFrames}</span>
-                  </div>
-                  <ButtonGroup className="mb-3">
-                    <Button variant="outline-secondary" onClick={handleReset}>⏮️</Button>
-                    <Button variant="outline-secondary" onClick={handlePrev}>⏪</Button>
-                    {isPlaying ? (
-                      <Button variant="outline-primary" onClick={handlePause}>⏸️</Button>
-                    ) : (
-                      <Button variant="outline-primary" onClick={handlePlay}>▶️</Button>
-                    )}
-                    <Button variant="outline-secondary" onClick={handleNext}>⏩</Button>
-                  </ButtonGroup>
-                  
-                  <Form.Group as={Row} className="mb-2 align-items-center">
-                    <Form.Label column sm={4}>Frame Delay (ms):</Form.Label>
-                    <Col sm={5}>
-                      <Form.Range 
-                        min={50} 
-                        max={1000} 
-                        step={50}
-                        value={frameDelay}
-                        onChange={(e) => setFrameDelay(parseInt(e.target.value))}
-                      />
-                    </Col>
-                    <Col sm={3}>
-                      <Form.Control 
-                        type="number" 
-                        size="sm"
+    <Paper sx={{ mb: 3, overflow: 'hidden' }}>
+      <HeaderBox>
+        <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
+          <MovieIcon sx={{ mr: 1 }} />
+          Animation Result
+        </Typography>
+        {showControls && animationFrames.length > 1 && (
+          <Button 
+            variant="outlined"
+            size="small"
+            startIcon={<VisibilityOffIcon />}
+            onClick={() => setShowControls(false)}
+            sx={{ bgcolor: 'background.paper' }}
+          >
+            Hide Controls
+          </Button>
+        )}
+        {!showControls && animationFrames.length > 1 && (
+          <Button 
+            variant="outlined"
+            size="small"
+            startIcon={<VisibilityIcon />}
+            onClick={() => setShowControls(true)}
+            sx={{ bgcolor: 'background.paper' }}
+          >
+            Show Controls
+          </Button>
+        )}
+      </HeaderBox>
+      
+      <Box sx={{ p: 2 }}>
+        {showControls && animationFrames.length > 1 && (
+          <AnimationControls>
+            <Card variant="outlined" sx={{ mb: 2 }}>
+              <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                  Frame: {currentFrameIndex + 1}/{totalFrames}
+                </Typography>
+                <ButtonGroup size="small" sx={{ mb: 2 }}>
+                  <Button onClick={handleReset}>
+                    <FirstPageIcon />
+                  </Button>
+                  <Button onClick={handlePrev}>
+                    <SkipPreviousIcon />
+                  </Button>
+                  {isPlaying ? (
+                    <Button color="primary" onClick={handlePause}>
+                      <PauseIcon />
+                    </Button>
+                  ) : (
+                    <Button color="primary" onClick={handlePlay}>
+                      <PlayArrowIcon />
+                    </Button>
+                  )}
+                  <Button onClick={handleNext}>
+                    <SkipNextIcon />
+                  </Button>
+                </ButtonGroup>
+                
+                <Box sx={{ mb: 1 }}>
+                  <Grid container spacing={2} alignItems="center">
+                    <Grid item xs={4}>
+                      <Typography variant="body2">Frame Delay:</Typography>
+                    </Grid>
+                    <Grid item xs={5}>
+                      <Slider
                         min={50}
                         max={1000}
                         step={50}
                         value={frameDelay}
-                        onChange={(e) => setFrameDelay(parseInt(e.target.value))}
+                        onChange={(e, value) => setFrameDelay(value as number)}
+                        size="small"
                       />
-                    </Col>
-                  </Form.Group>
-                  
-                  <div>
-                    <small className="text-muted">
-                      {frameDelay < 200 ? 'Fast' : frameDelay < 500 ? 'Medium' : 'Slow'} - 
-                      {frameDelay}ms ({(frameDelay / 1000).toFixed(1)}s)
-                    </small>
-                  </div>
-                  
-                  {onGenerateGif && (
+                    </Grid>
+                    <Grid item xs={3}>
+                      <TextField
+                        type="number"
+                        size="small"
+                        inputProps={{
+                          min: 50,
+                          max: 1000,
+                          step: 50
+                        }}
+                        value={frameDelay}
+                        onChange={(e) => setFrameDelay(parseInt(e.target.value))}
+                        sx={{ width: '100%' }}
+                      />
+                    </Grid>
+                  </Grid>
+                </Box>
+                
+                <Typography variant="caption" color="text.secondary">
+                  {speedText} - {frameDelay}ms ({(frameDelay / 1000).toFixed(1)}s)
+                </Typography>
+                
+                {onGenerateGif && (
+                  <Box sx={{ mt: 2 }}>
                     <Button 
-                      variant="outline-success" 
-                      size="sm" 
+                      variant="outlined" 
+                      color="success"
+                      size="small" 
                       onClick={handleRegenerateGif}
-                      className="mt-2"
+                      startIcon={<SettingsIcon />}
                     >
                       Regenerate GIF with Current Settings
                     </Button>
-                  )}
-                </Card.Body>
-              </Card>
-            </AnimationControls>
-          )}
-          
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          </AnimationControls>
+        )}
+        
+        <Stack spacing={3}>
           {tables.map(table => (
-            <div key={table.id} className="mb-4">
-              <h5>{table.name}</h5>
+            <Box key={table.id}>
+              <Typography variant="h6" sx={{ mb: 1 }}>
+                {table.name}
+              </Typography>
               {table.columns.length > 0 ? (
-                <div className="table-responsive">
-                  <StyledTable striped bordered>
-                    <thead>
-                      <tr>
-                        <th>#</th>
+                <TableContainer sx={{ mb: 1 }}>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
                         {table.columns.map(column => {
                           const isHeaderHighlighted = isColumnHeaderHighlighted(table.id, column.id);
                           
@@ -257,31 +318,31 @@ const AnimationDisplay: React.FC<AnimationDisplayProps> = ({
                               {column.name}
                             </HighlightedHeader>
                           ) : (
-                            <th key={column.id}>
+                            <TableCell key={column.id}>
                               {column.name}
-                            </th>
+                            </TableCell>
                           );
                         })}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {table.rows.map((row, rowIndex) => {
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {table.rows.map((row) => {
                         const rowIsHighlighted = isRowHighlighted(table.id, row.id);
                         
                         if (rowIsHighlighted) {
                           return (
                             <HighlightedRow key={row.id}>
-                              <td>{rowIndex + 1}</td>
                               {table.columns.map(column => (
-                                <td key={column.id}>{row.cells[column.id] || ''}</td>
+                                <TableCell key={column.id}>
+                                  {row.cells[column.id] || ''}
+                                </TableCell>
                               ))}
                             </HighlightedRow>
                           );
                         }
                         
                         return (
-                          <tr key={row.id}>
-                            <td>{rowIndex + 1}</td>
+                          <TableRow key={row.id}>
                             {table.columns.map(column => {
                               const cellIsHighlighted = isColumnHighlighted(table.id, column.id, row.id);
                               
@@ -293,43 +354,48 @@ const AnimationDisplay: React.FC<AnimationDisplayProps> = ({
                                 );
                               }
                               
-                              return <td key={column.id}>{row.cells[column.id] || ''}</td>;
+                              return <TableCell key={column.id}>{row.cells[column.id] || ''}</TableCell>;
                             })}
-                          </tr>
+                          </TableRow>
                         );
                       })}
-                    </tbody>
-                  </StyledTable>
-                </div>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               ) : (
-                <div className="alert alert-info">No columns in this table</div>
+                <Alert severity="info" sx={{ mb: 2 }}>
+                  No columns in this table
+                </Alert>
               )}
-            </div>
+            </Box>
           ))}
-          
-          {gifUrl && (
-            <GifContainer>
-              <h5>Generated Animation GIF</h5>
-              <img src={gifUrl} alt="Animation" />
-              <div className="mt-2">
-                <Button 
-                  variant="outline-primary" 
-                  size="sm"
-                  onClick={() => {
-                    const link = document.createElement('a');
-                    link.href = gifUrl;
-                    link.download = 'table-animation.gif';
-                    link.click();
-                  }}
-                >
-                  Download GIF
-                </Button>
-              </div>
-            </GifContainer>
-          )}
-        </Card.Body>
-      </Card>
-    </AnimationContainer>
+        </Stack>
+        
+        {gifUrl && (
+          <GifContainer>
+            <Typography variant="h6" sx={{ mb: 1 }}>
+              Generated Animation GIF
+            </Typography>
+            <img src={gifUrl} alt="Animation" />
+            <Box sx={{ mt: 2 }}>
+              <Button 
+                variant="outlined" 
+                size="small"
+                startIcon={<DownloadIcon />}
+                onClick={() => {
+                  const link = document.createElement('a');
+                  link.href = gifUrl;
+                  link.download = 'table-animation.gif';
+                  link.click();
+                }}
+              >
+                Download GIF
+              </Button>
+            </Box>
+          </GifContainer>
+        )}
+      </Box>
+    </Paper>
   );
 };
 

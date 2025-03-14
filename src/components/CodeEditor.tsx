@@ -1,18 +1,24 @@
 import React from 'react';
-import { Card, Button, Alert } from 'react-bootstrap';
+import { 
+  Paper, 
+  Typography, 
+  Button, 
+  Box, 
+  Alert, 
+  AlertTitle,
+  Divider
+} from '@mui/material';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import styled from 'styled-components';
-
-const EditorCard = styled(Card)`
-  margin-bottom: 20px;
-`;
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import CodeIcon from '@mui/icons-material/Code';
 
 const EditorContainer = styled.div`
   .cm-editor {
-    border: 1px solid #ced4da;
-    border-radius: 0.25rem;
-    font-family: monospace;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', 'Fira Code', Menlo, monospace;
     height: 200px;
     overflow: auto;
   }
@@ -31,26 +37,35 @@ highlight in table 'users' column 'name';
 highlight in table 'users' column 'email' row 2;`;
 
   return (
-    <EditorCard>
-      <Card.Header>
-        <h4>SQL Visualization Code</h4>
-      </Card.Header>
-      <Card.Body>
-        <p>
+    <Paper sx={{ mb: 3, overflow: 'hidden' }}>
+      <Box sx={{ 
+        p: 2, 
+        bgcolor: 'primary.main', 
+        color: 'primary.contrastText' 
+      }}>
+        <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
+          <CodeIcon sx={{ mr: 1 }} />
+          SQL Visualization Code
+        </Typography>
+      </Box>
+      
+      <Box sx={{ p: 2 }}>
+        <Typography variant="body2" sx={{ mb: 2 }}>
           Write your animation code using the custom syntax below.
           Each command creates one frame in the animation.
-        </p>
-        <Alert variant="info">
-          <Alert.Heading>Custom Syntax Guide</Alert.Heading>
-          <ul className="mb-0">
-            <li><code>highlight in table 'tablename' row 1,2,3;</code> - Highlight specific rows</li>
-            <li><code>highlight in table 'tablename' column 'columnname';</code> - Highlight a column</li>
-            <li><code>highlight in table 'tablename' column 'columnname' row 1;</code> - Highlight a specific cell</li>
-          </ul>
-          <hr />
-          <p className="mb-0">
+        </Typography>
+        
+        <Alert severity="info" sx={{ mb: 3 }}>
+          <AlertTitle>Custom Syntax Guide</AlertTitle>
+          <Box component="ul" sx={{ pl: 2, mb: 1 }}>
+            <li><Typography component="code" sx={{ fontFamily: 'monospace' }}>highlight in table 'tablename' row 1,2,3;</Typography> - Highlight specific rows</li>
+            <li><Typography component="code" sx={{ fontFamily: 'monospace' }}>highlight in table 'tablename' column 'columnname';</Typography> - Highlight a column</li>
+            <li><Typography component="code" sx={{ fontFamily: 'monospace' }}>highlight in table 'tablename' column 'columnname' row 1;</Typography> - Highlight a specific cell</li>
+          </Box>
+          <Divider sx={{ my: 1 }} />
+          <Typography variant="body2">
             Make sure to use quotes around table and column names, and separate each command with a semicolon (;).
-          </p>
+          </Typography>
         </Alert>
         
         <EditorContainer>
@@ -64,24 +79,27 @@ highlight in table 'users' column 'email' row 2;`;
           />
         </EditorContainer>
         
-        <div className="d-flex justify-content-between mt-3">
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
           <Button 
-            variant="outline-secondary" 
+            variant="outlined" 
+            color="secondary"
             onClick={() => setCode(sampleCode)}
             disabled={code.trim() !== ''}
           >
             Insert Sample Code
           </Button>
           <Button 
-            variant="primary" 
+            variant="contained" 
+            startIcon={<PlayArrowIcon />}
             onClick={onExecute}
             disabled={code.trim() === ''}
+            color="primary"
           >
             Execute and Generate Animation
           </Button>
-        </div>
-      </Card.Body>
-    </EditorCard>
+        </Box>
+      </Box>
+    </Paper>
   );
 };
 

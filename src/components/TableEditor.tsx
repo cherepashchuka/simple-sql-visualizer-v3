@@ -1,18 +1,80 @@
 import React, { useState } from 'react';
-import { Button, Form, Table, Card, Row, Col } from 'react-bootstrap';
+import { 
+  Paper, 
+  Typography, 
+  Button, 
+  TextField, 
+  Box, 
+  Grid, 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableContainer, 
+  TableHead, 
+  TableRow,
+  IconButton,
+  Alert,
+  Stack,
+  Divider,
+  styled
+} from '@mui/material';
 import { Table as TableType, Column, Row as RowType } from '../types';
 import { v4 as uuidv4 } from 'uuid';
-import styled from 'styled-components';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import TableRowsIcon from '@mui/icons-material/TableRows';
+import TableChartIcon from '@mui/icons-material/TableChart';
+import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 
-const TableContainer = styled.div`
-  margin-bottom: 20px;
-`;
+// Styled components
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  position: 'relative',
+  '&:hover .row-delete-button': {
+    opacity: 1,
+  },
+}));
 
-const ScrollableTable = styled(Table)`
-  width: 100%;
-  overflow-x: auto;
-  display: block;
-`;
+const TableNameInput = styled(TextField)(({ theme }) => ({
+  '& .MuiInputBase-input': {
+    fontWeight: 'bold',
+    fontSize: '1.1rem',
+  },
+  '& .MuiOutlinedInput-root': {
+    '& fieldset': {
+      borderColor: 'transparent',
+    },
+    '&:hover fieldset': {
+      borderColor: theme.palette.primary.light,
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: theme.palette.primary.main,
+    },
+  },
+  background: 'white',
+  borderRadius: theme.shape.borderRadius,
+  width: '60%',
+}));
+
+const HeaderBox = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(2),
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.primary.contrastText,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+}));
+
+const RowDeleteButton = styled(IconButton)(({ theme }) => ({
+  position: 'absolute',
+  right: -8,
+  opacity: 0,
+  transition: 'opacity 0.2s',
+  color: theme.palette.error.main,
+  padding: 4,
+  '&:hover': {
+    backgroundColor: 'rgba(244, 67, 54, 0.08)',
+  },
+}));
 
 interface TableEditorProps {
   tables: TableType[];
@@ -183,138 +245,178 @@ const TableEditor: React.FC<TableEditorProps> = ({ tables, setTables }) => {
   };
 
   return (
-    <div>
-      <h3>Tables ({tables.length}/3)</h3>
-      
-      {tables.length < 3 && (
-        <Form className="mb-4">
-          <Row>
-            <Col>
-              <Form.Control
-                type="text"
-                placeholder="Enter table name"
-                value={newTableName}
-                onChange={(e) => setNewTableName(e.target.value)}
-              />
-            </Col>
-            <Col xs="auto">
-              <Button onClick={addTable}>Add Table</Button>
-            </Col>
-          </Row>
-        </Form>
-      )}
-      
-      {tables.map(table => (
-        <TableContainer key={table.id}>
-          <Card>
-            <Card.Header>
-              <Row className="align-items-center">
-                <Col>
-                  <Form.Control
-                    type="text"
-                    value={table.name}
-                    onChange={(e) => updateTableName(table.id, e.target.value)}
-                    className="font-weight-bold"
+    <Box>
+      <Paper sx={{ mb: 3, overflow: 'hidden' }}>
+        <HeaderBox>
+          <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
+            <TableChartIcon sx={{ mr: 1 }} />
+            Table Editor
+          </Typography>
+        </HeaderBox>
+        
+        <Box sx={{ p: 2 }}>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            Create up to 3 tables with custom columns and rows.
+          </Typography>
+          
+          {tables.length < 3 && (
+            <Box sx={{ mb: 3 }}>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs>
+                  <TextField
+                    fullWidth
+                    label="Enter table name"
+                    variant="outlined"
+                    size="small"
+                    value={newTableName}
+                    onChange={(e) => setNewTableName(e.target.value)}
                   />
-                </Col>
-                <Col xs="auto">
-                  <Button variant="danger" onClick={() => removeTable(table.id)} size="sm">
-                    Remove Table
+                </Grid>
+                <Grid item>
+                  <Button 
+                    variant="contained" 
+                    startIcon={<TableChartIcon />}
+                    onClick={addTable}
+                    disabled={!newTableName.trim()}
+                  >
+                    Add Table
                   </Button>
-                </Col>
-              </Row>
-            </Card.Header>
-            <Card.Body>
-              <Form className="mb-3">
-                <Row>
-                  <Col>
-                    <Form.Control
-                      type="text"
-                      placeholder="Enter column name"
+                </Grid>
+              </Grid>
+            </Box>
+          )}
+          
+          {tables.map(table => (
+            <Paper key={table.id} sx={{ mb: 3, overflow: 'hidden' }}>
+              <HeaderBox>
+                <TableNameInput
+                  placeholder="Table Name"
+                  variant="outlined"
+                  size="small"
+                  value={table.name}
+                  onChange={(e) => updateTableName(table.id, e.target.value)}
+                  InputProps={{
+                    startAdornment: <TableChartIcon sx={{ mr: 1, color: 'primary.dark' }} />,
+                  }}
+                />
+                <Button 
+                  variant="outlined" 
+                  color="error"
+                  size="small"
+                  onClick={() => removeTable(table.id)}
+                  sx={{ bgcolor: 'background.paper' }}
+                >
+                  Remove Table
+                </Button>
+              </HeaderBox>
+              
+              <Box sx={{ p: 2 }}>
+                <Grid container spacing={2} alignItems="center" sx={{ mb: 2 }}>
+                  <Grid item xs>
+                    <TextField
+                      fullWidth
+                      label="Enter column name"
+                      variant="outlined"
+                      size="small"
                       value={newColumnName[table.id] || ''}
                       onChange={(e) => setNewColumnName({
                         ...newColumnName,
                         [table.id]: e.target.value
                       })}
                     />
-                  </Col>
-                  <Col xs="auto">
-                    <Button onClick={() => addColumn(table.id)}>Add Column</Button>
-                  </Col>
-                  <Col xs="auto">
-                    <Button onClick={() => addRow(table.id)}>Add Row</Button>
-                  </Col>
-                </Row>
-              </Form>
-              
-              {table.columns.length > 0 && (
-                <div className="table-responsive">
-                  <ScrollableTable striped bordered hover>
-                    <thead>
-                      <tr>
-                        <th>#</th>
-                        {table.columns.map(column => (
-                          <th key={column.id}>
-                            <div className="d-flex justify-content-between align-items-center">
-                              <span>{column.name}</span>
-                              <Button
-                                variant="outline-danger"
-                                size="sm"
-                                onClick={() => removeColumn(table.id, column.id)}
-                              >
-                                ×
-                              </Button>
-                            </div>
-                          </th>
-                        ))}
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {table.rows.map((row, rowIndex) => (
-                        <tr key={row.id}>
-                          <td>{rowIndex + 1}</td>
+                  </Grid>
+                  <Grid item>
+                    <Stack direction="row" spacing={1}>
+                      <Button 
+                        variant="outlined" 
+                        startIcon={<ViewColumnIcon />}
+                        onClick={() => addColumn(table.id)}
+                        disabled={!newColumnName[table.id]?.trim()}
+                        size="small"
+                      >
+                        Add Column
+                      </Button>
+                      <Button 
+                        variant="outlined" 
+                        startIcon={<TableRowsIcon />}
+                        onClick={() => addRow(table.id)}
+                        disabled={table.columns.length === 0}
+                        size="small"
+                      >
+                        Add Row
+                      </Button>
+                    </Stack>
+                  </Grid>
+                </Grid>
+                
+                <Divider sx={{ my: 2 }} />
+                
+                {table.columns.length > 0 ? (
+                  <TableContainer sx={{ maxHeight: 400 }}>
+                    <Table stickyHeader size="small">
+                      <TableHead>
+                        <TableRow>
                           {table.columns.map(column => (
-                            <td key={column.id}>
-                              <Form.Control
-                                type="text"
-                                value={row.cells[column.id] || ''}
-                                onChange={(e) => updateCell(table.id, row.id, column.id, e.target.value)}
-                              />
-                            </td>
+                            <TableCell key={column.id}>
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Typography variant="body2" fontWeight="medium">{column.name}</Typography>
+                                <IconButton 
+                                  size="small" 
+                                  onClick={() => removeColumn(table.id, column.id)}
+                                  color="error"
+                                >
+                                  <DeleteIcon fontSize="small" />
+                                </IconButton>
+                              </Box>
+                            </TableCell>
                           ))}
-                          <td>
-                            <Button
-                              variant="danger"
-                              size="sm"
-                              onClick={() => removeRow(table.id, row.id)}
-                            >
-                              Remove
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </ScrollableTable>
-                </div>
-              )}
-              
-              {table.columns.length === 0 && (
-                <div className="alert alert-info">
-                  Add columns to start building your table
-                </div>
-              )}
-            </Card.Body>
-          </Card>
-        </TableContainer>
-      ))}
-      
-      {tables.length === 0 && (
-        <div className="alert alert-info">
-          Add a table to get started
-        </div>
-      )}
-    </div>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {table.rows.map((row) => (
+                          <StyledTableRow key={row.id}>
+                            {table.columns.map(column => (
+                              <TableCell key={column.id} sx={{ position: 'relative' }}>
+                                <TextField
+                                  fullWidth
+                                  variant="outlined"
+                                  size="small"
+                                  value={row.cells[column.id] || ''}
+                                  onChange={(e) => updateCell(table.id, row.id, column.id, e.target.value)}
+                                />
+                                {column === table.columns[table.columns.length - 1] && (
+                                  <RowDeleteButton
+                                    size="small"
+                                    onClick={() => removeRow(table.id, row.id)}
+                                    className="row-delete-button"
+                                  >
+                                    <DeleteIcon fontSize="small" />
+                                  </RowDeleteButton>
+                                )}
+                              </TableCell>
+                            ))}
+                          </StyledTableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                ) : (
+                  <Alert severity="info">
+                    Add columns to start building your table
+                  </Alert>
+                )}
+              </Box>
+            </Paper>
+          ))}
+          
+          {tables.length === 0 && (
+            <Alert severity="info" sx={{ mt: 2 }}>
+              Add a table to get started
+            </Alert>
+          )}
+        </Box>
+      </Paper>
+    </Box>
   );
 };
 
