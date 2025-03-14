@@ -87,11 +87,11 @@ const App = () => {
       </Typography>
       
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12}>
           <TableEditor tables={tables} setTables={handleUpdateTables} />
         </Grid>
         
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12}>
           <CodeEditor 
             code={code} 
             setCode={setCode} 
@@ -99,14 +99,14 @@ const App = () => {
           />
           
           {error && (
-            <Alert severity="error" sx={{ mb: 3 }}>
+            <Alert severity="error" sx={{ mt: 3 }}>
               <AlertTitle>Error</AlertTitle>
               {error}
             </Alert>
           )}
           
-          {isGenerating ? (
-            <Paper sx={{ p: 5, textAlign: 'center' }}>
+          {isGenerating && (
+            <Paper sx={{ p: 5, textAlign: 'center', mt: 3 }}>
               <CircularProgress />
               <Typography variant="body1" sx={{ mt: 2 }}>
                 Generating animation...
@@ -115,7 +115,11 @@ const App = () => {
                 This might take a few moments, especially for complex tables
               </Typography>
             </Paper>
-          ) : actions.length > 0 && (
+          )}
+        </Grid>
+        
+        {actions.length > 0 && (
+          <Grid item xs={12}>
             <AnimationDisplay 
               tables={tables}
               animationFrames={[
@@ -130,8 +134,8 @@ const App = () => {
               gifUrl={gifUrl}
               onGenerateGif={handleExecute}
             />
-          )}
-        </Grid>
+          </Grid>
+        )}
       </Grid>
       
       <Box sx={{ mt: 6, pt: 3, borderTop: '1px solid #e2e8f0', textAlign: 'center' }}>

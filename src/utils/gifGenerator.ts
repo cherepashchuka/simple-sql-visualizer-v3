@@ -140,15 +140,14 @@ const renderTablesToHTML = (tables: Table[], frame: AnimationFrame): string => {
       ${tables.map(table => `
         <div style="margin-bottom: 20px;">
           <h3 style="margin-bottom: 10px;">${table.name}</h3>
-          <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd;">
+          <table style="width: 100%; border-collapse: collapse; border: 1px solid #eee; table-layout: fixed; margin-bottom: 20px;">
             <thead>
               <tr>
-                <th style="padding: 8px; border: 1px solid #ddd; background-color: #f2f2f2;">#</th>
                 ${table.columns.map(column => {
                   const isColumnHighlighted = isColumnHeaderHighlighted(frame, table.id, column.id);
                   const headerStyle = isColumnHighlighted 
-                    ? 'padding: 8px; border: 1px solid #ddd; background-color: #ffc107;' 
-                    : 'padding: 8px; border: 1px solid #ddd; background-color: #f2f2f2;';
+                    ? 'padding: 5px 10px; border: 1px solid #eee; text-align: right; background-color: #ffc107;' 
+                    : 'padding: 5px 10px; border: 1px solid #eee; text-align: right; background-color: #f2f2f2;';
                   
                   return `
                     <th style="${headerStyle}">
@@ -163,17 +162,18 @@ const renderTablesToHTML = (tables: Table[], frame: AnimationFrame): string => {
                 const isRowHighlighted = isHighlightedRow(frame, table.id, row.id);
                 const rowStyle = isRowHighlighted 
                   ? 'background-color: #ffc107;' 
-                  : rowIndex % 2 === 0 ? 'background-color: #f9f9f9;' : '';
+                  : rowIndex % 2 === 0 ? 'background-color: #fff;' : 'background-color: #f7f7f7;';
                 
                 return `
                   <tr style="${rowStyle}">
-                    <td style="padding: 8px; border: 1px solid #ddd;">${rowIndex + 1}</td>
                     ${table.columns.map(column => {
                       const isCellHighlighted = isHighlightedCell(frame, table.id, column.id, row.id);
-                      const cellStyle = isCellHighlighted ? 'background-color: #ffc107;' : '';
+                      const cellStyle = isCellHighlighted 
+                        ? 'padding: 5px 10px; border: 1px solid #eee; text-align: right; background-color: #ffc107;' 
+                        : 'padding: 5px 10px; border: 1px solid #eee; text-align: right;';
                       
                       return `
-                        <td style="padding: 8px; border: 1px solid #ddd; ${cellStyle}">
+                        <td style="${cellStyle}">
                           ${row.cells[column.id] || ''}
                         </td>
                       `;
@@ -191,8 +191,8 @@ const renderTablesToHTML = (tables: Table[], frame: AnimationFrame): string => {
 
 // Helper function to check if a column header should be highlighted
 const isColumnHeaderHighlighted = (frame: AnimationFrame, tableId: string, columnId: string): boolean => {
-  if (frame.tableId !== tableId) return false;
-  return frame.columnId === columnId && !frame.rowIds?.length;
+  // Always return false to prevent column headers from being highlighted
+  return false;
 };
 
 // Helper function to check if a row is highlighted
