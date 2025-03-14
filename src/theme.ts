@@ -45,7 +45,7 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily: '"IBM Plex Sans", "Roboto", "Helvetica", "Arial", sans-serif',
     h1: {
       fontWeight: 700,
       fontSize: '2.5rem',
