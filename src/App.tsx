@@ -265,8 +265,27 @@ const App = () => {
                       rowIds: action.rowIds,
                       columnId: action.columnId
                     };
+                  } else if (action.type === 'addColumn') {
+                    // For add column action, highlight the new column
+                    const table = tables.find(t => t.id === action.tableId);
+                    if (table) {
+                      const newColumn = table.columns[table.columns.length - 1];
+                      return {
+                        tableId: action.tableId,
+                        columnId: newColumn.id
+                      };
+                    }
+                  } else if (action.type === 'addRow') {
+                    // For add row action, highlight the new row
+                    const table = tables.find(t => t.id === action.tableId);
+                    if (table) {
+                      const newRow = table.rows[table.rows.length - 1];
+                      return {
+                        tableId: action.tableId,
+                        rowIds: [newRow.id]
+                      };
+                    }
                   }
-                  // For add column and add row actions, don't highlight anything
                   return { tableId: '', rowIds: [], columnId: '' };
                 })
               ]}
