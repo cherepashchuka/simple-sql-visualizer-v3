@@ -9,17 +9,6 @@ When creating this tool, I was guided by the fact that it would help me in compi
 ![image](https://github.com/user-attachments/assets/8717c010-7945-4e1b-ab3a-73de507ceaf1)
 ![table-animation (6)](https://github.com/user-attachments/assets/cfc44a50-f48f-49b1-b865-9887630433b6)
 
-
-
-## ✨ Features
-
-- 🎨 **Beautiful Visualizations**: Clean, modern UI with smooth animations
-- 📝 **Simple Syntax**: Write table definitions in plain text
-- 🎥 **GIF Export**: Create animated GIFs of your table structures
-- 🎯 **Interactive**: Click and drag to rearrange tables
-- 🔄 **Real-time Updates**: See changes instantly as you type
-
-
 ## 📖 Syntax Guide
 
 ### Highlighting Elements
