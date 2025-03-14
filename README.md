@@ -4,6 +4,13 @@ A SQL table visualization tool that helps you understand and present database qu
 When creating this tool, I was guided by the fact that it would help me in compiling documentation for software and pipelines for ML services.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![image](https://github.com/user-attachments/assets/d778a0ff-4f9f-4f1e-8115-39a39d227cbf)
+![image](https://github.com/user-attachments/assets/37d46cc7-fc69-49d2-95a4-456d6630de1e)
+![image](https://github.com/user-attachments/assets/354c59a4-f07d-4c18-88a2-a509d7a484ac)
+![table-animation (2)](https://github.com/user-attachments/assets/357c2335-4163-439d-95f1-f560bc57da78)
+
+
+
 
 ## ✨ Features
 
