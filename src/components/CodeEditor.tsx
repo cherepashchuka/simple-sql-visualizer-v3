@@ -113,7 +113,7 @@ highlight in table 'users' column 'email' row 2;`;
               }
             }}
           >
-            Execute and Generate Animation
+            Generate GIF
           </Button>
         </Box>
       </Box>

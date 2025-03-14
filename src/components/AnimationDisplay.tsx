@@ -131,7 +131,7 @@ const AnimationDisplay: React.FC<AnimationDisplayProps> = ({
                     }
                   }}
                 >
-                  Regenerate GIF with Current Settings
+                  Update
                 </Button>
               </Box>
             )}

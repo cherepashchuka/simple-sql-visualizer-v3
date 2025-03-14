@@ -7,7 +7,11 @@ import {
   Box, 
   CircularProgress, 
   Alert, 
-  AlertTitle 
+  AlertTitle,
+  Button,
+  Tooltip,
+  Snackbar,
+  Badge
 } from '@mui/material';
 import TableEditor from './components/TableEditor';
 import CodeEditor from './components/CodeEditor';
@@ -15,8 +19,19 @@ import AnimationDisplay from './components/AnimationDisplay';
 import { Table, Action } from './types';
 import { parseCode } from './utils/parser';
 import { generateGif } from './utils/gifGenerator';
-import { saveTables, loadTables } from './utils/storage';
+import { 
+  saveTables, 
+  loadTables, 
+  saveCode, 
+  loadCode, 
+  clearStorage, 
+  checkAutoReset, 
+  updateLastActivity,
+  getTimeUntilReset
+} from './utils/storage';
 import { v4 as uuidv4 } from 'uuid';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 const App = () => {
   const [tables, setTables] = useState<Table[]>([]);
@@ -27,17 +42,93 @@ const App = () => {
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [generationProgress, setGenerationProgress] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [showAutoResetNotification, setShowAutoResetNotification] = useState<boolean>(false);
+  const [timeUntilReset, setTimeUntilReset] = useState<number | null>(null);
 
-  // Load tables from localStorage on initial load
+  // Set up activity tracking and timer
   useEffect(() => {
+    // Update activity on user interactions
+    const handleUserActivity = () => {
+      updateLastActivity();
+      updateTimeUntilReset();
+    };
+
+    // Add event listeners for user activity
+    window.addEventListener('mousemove', handleUserActivity);
+    window.addEventListener('keydown', handleUserActivity);
+    window.addEventListener('click', handleUserActivity);
+    window.addEventListener('scroll', handleUserActivity);
+    
+    // Initial activity update
+    updateLastActivity();
+    updateTimeUntilReset();
+    
+    // Set up timer to update the remaining time display
+    const timer = setInterval(() => {
+      updateTimeUntilReset();
+    }, 60000); // Update every minute
+    
+    return () => {
+      // Clean up event listeners and timer
+      window.removeEventListener('mousemove', handleUserActivity);
+      window.removeEventListener('keydown', handleUserActivity);
+      window.removeEventListener('click', handleUserActivity);
+      window.removeEventListener('scroll', handleUserActivity);
+      clearInterval(timer);
+    };
+  }, []);
+  
+  // Helper function to update the time until reset
+  const updateTimeUntilReset = () => {
+    const remainingTime = getTimeUntilReset();
+    setTimeUntilReset(remainingTime);
+  };
+
+  // Load tables and code from localStorage on initial load
+  useEffect(() => {
+    // Check if data was auto-reset due to inactivity
+    const wasAutoReset = checkAutoReset();
+    if (wasAutoReset) {
+      setShowAutoResetNotification(true);
+    }
+    
     const savedTables = loadTables();
+    const savedCode = loadCode();
+    
     setTables(savedTables);
+    setCode(savedCode);
   }, []);
 
   // Save tables to localStorage when they change
   useEffect(() => {
-    saveTables(tables);
+    if (tables.length > 0) {
+      setIsSaving(true);
+      saveTables(tables);
+      
+      // Show saving indicator for a short time
+      const timer = setTimeout(() => {
+        setIsSaving(false);
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
   }, [tables]);
+  
+  // Save code to localStorage when it changes
+  useEffect(() => {
+    if (code) {
+      setIsSaving(true);
+      saveCode(code);
+      
+      // Show saving indicator for a short time
+      const timer = setTimeout(() => {
+        setIsSaving(false);
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [code]);
 
   const handleExecute = async (frameDelay?: number) => {
     try {
@@ -80,15 +171,58 @@ const App = () => {
     }
   };
 
+  // Reset application state
+  const handleReset = () => {
+    if (window.confirm('Are you sure you want to reset all tables and code? This action cannot be undone.')) {
+      clearStorage();
+      setTables([]);
+      setCode('');
+      setActions([]);
+      setGifUrl(null);
+      setError(null);
+    }
+  };
+
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Typography variant="h3" component="h1" gutterBottom sx={{ mb: 4, fontWeight: 'bold', color: '#0D47A1' }}>
-        Simple SQL Visualizer
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom sx={{ mb: 0, fontWeight: 'bold', color: '#0D47A1' }}>
+          Simple SQL Visualizer
+        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          {isSaving && (
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center' }}>
+              <CircularProgress size={16} sx={{ mr: 1 }} />
+              Saving...
+            </Typography>
+          )}
+          
+          {timeUntilReset !== null && (
+            <Tooltip title={`Auto-reset in ${timeUntilReset} minutes of inactivity`}>
+              <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
+                <AccessTimeIcon fontSize="small" sx={{ mr: 0.5 }} />
+                <Typography variant="caption">{timeUntilReset}m</Typography>
+              </Box>
+            </Tooltip>
+          )}
+          
+          <Tooltip title="Reset all data">
+            <Button 
+              variant="outlined" 
+              color="error" 
+              startIcon={<RestartAltIcon />}
+              onClick={handleReset}
+              size="small"
+            >
+              Reset
+            </Button>
+          </Tooltip>
+        </Box>
+      </Box>
       
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <TableEditor tables={tables} setTables={handleUpdateTables} />
+          <TableEditor tables={tables} setTables={setTables} />
         </Grid>
         
         <Grid item xs={12}>
@@ -143,6 +277,15 @@ const App = () => {
         The project is Open Source and first version was done by <a href="https://github.com/cherepashchuka"><strong>Andrei Cherepashchuk</strong></a>
         </Typography>
       </Box>
+      
+      {/* Auto-reset notification */}
+      <Snackbar
+        open={showAutoResetNotification}
+        autoHideDuration={6000}
+        onClose={() => setShowAutoResetNotification(false)}
+        message="Data has been reset due to 1 hour of inactivity"
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      />
     </Container>
   );
 };
