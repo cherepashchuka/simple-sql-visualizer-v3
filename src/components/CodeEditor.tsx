@@ -13,6 +13,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import styled from 'styled-components';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import CodeIcon from '@mui/icons-material/Code';
+import { useTheme } from '@mui/material/styles';
 
 const EditorContainer = styled.div`
   .cm-editor {
@@ -36,11 +37,13 @@ highlight in table 'users' row 1;
 highlight in table 'users' column 'name';
 highlight in table 'users' column 'email' row 2;`;
 
+  const theme = useTheme();
+
   return (
-    <Paper sx={{ mb: 3, overflow: 'hidden' }}>
+    <Paper sx={{ mb: 3, overflow: 'hidden', backgroundColor: theme.palette.background.default }}>
       <Box sx={{ 
         p: 2, 
-        bgcolor: 'primary.main', 
+        bgcolor: '#0D47A1', 
         color: 'primary.contrastText' 
       }}>
         <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
@@ -56,11 +59,11 @@ highlight in table 'users' column 'email' row 2;`;
         </Typography>
         
         <Alert severity="info" sx={{ mb: 3 }}>
-          <AlertTitle>Custom Syntax Guide</AlertTitle>
+          <AlertTitle>Syntax Guide</AlertTitle>
           <Box component="ul" sx={{ pl: 2, mb: 1 }}>
-            <li><Typography component="code" sx={{ fontFamily: 'monospace' }}>highlight in table 'tablename' row 1,2,3;</Typography> - Highlight specific rows</li>
-            <li><Typography component="code" sx={{ fontFamily: 'monospace' }}>highlight in table 'tablename' column 'columnname';</Typography> - Highlight a column</li>
-            <li><Typography component="code" sx={{ fontFamily: 'monospace' }}>highlight in table 'tablename' column 'columnname' row 1;</Typography> - Highlight a specific cell</li>
+            <li><Typography component="code" sx={{ fontFamily: 'monospace' }}>highlight in table 'tablename' row 1,2,3;</Typography> ⎯ highlight specific rows.</li>
+            <li><Typography component="code" sx={{ fontFamily: 'monospace' }}>highlight in table 'tablename' column 'columnname';</Typography> ⎯ highlight a column.</li>
+            <li><Typography component="code" sx={{ fontFamily: 'monospace' }}>highlight in table 'tablename' column 'columnname' row 1;</Typography> ⎯ highlight a specific cell.</li>
           </Box>
           <Divider sx={{ my: 1 }} />
           <Typography variant="body2">
@@ -85,6 +88,14 @@ highlight in table 'users' column 'email' row 2;`;
             color="secondary"
             onClick={() => setCode(sampleCode)}
             disabled={code.trim() !== ''}
+            sx={{
+              color: '#0D47A1',
+              borderColor: '#0D47A1',
+              '&:hover': {
+                borderColor: '#0A3882',
+                backgroundColor: 'rgba(13, 71, 161, 0.04)'
+              }
+            }}
           >
             Insert Sample Code
           </Button>
@@ -93,7 +104,14 @@ highlight in table 'users' column 'email' row 2;`;
             startIcon={<PlayArrowIcon />}
             onClick={onExecute}
             disabled={code.trim() === ''}
-            color="primary"
+            sx={{
+              backgroundColor: '#0D47A1',
+              color: '#fff',
+              fontWeight: 'bold',
+              '&:hover': {
+                backgroundColor: '#0A3882'
+              }
+            }}
           >
             Execute and Generate Animation
           </Button>

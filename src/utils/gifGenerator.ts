@@ -114,13 +114,17 @@ export const generateGif = async (tables: Table[], actions: Action[], options?: 
         gifHeight: height,
         numWorkers: 2,
         interval: frameDurationInDeciseconds / 10, // Convert deciseconds to seconds
-        progressCallback: (progress) => {
+        progressCallback: (progress: number) => {
           console.log(`GIF generation progress: ${progress * 100}%`);
         }
-      }, (obj) => {
+      }, (obj: { error: boolean | string; image?: string }) => {
         if (!obj.error) {
           console.log('GIF created successfully');
-          resolve(obj.image);
+          if (obj.image) {
+            resolve(obj.image);
+          } else {
+            reject(new Error('GIF was created but no image was returned'));
+          }
         } else {
           console.error('GIF creation error:', obj.error);
           reject(new Error(`GIF creation error: ${obj.error}`));
@@ -136,18 +140,18 @@ export const generateGif = async (tables: Table[], actions: Action[], options?: 
 // Helper function to render tables to HTML for capturing
 const renderTablesToHTML = (tables: Table[], frame: AnimationFrame): string => {
   return `
-    <div style="background: white; padding: 20px; font-family: Arial, sans-serif;">
+    <div style="background: white; padding: 20px; font-family: 'IBM Plex Sans', Arial, sans-serif;">
       ${tables.map(table => `
         <div style="margin-bottom: 20px;">
-          <h3 style="margin-bottom: 10px;">${table.name}</h3>
+          <h3 style="margin-bottom: 10px; color: #0D47A1;">${table.name}</h3>
           <table style="width: 100%; border-collapse: collapse; border: 1px solid #eee; table-layout: fixed; margin-bottom: 20px;">
             <thead>
               <tr>
                 ${table.columns.map(column => {
                   const isColumnHighlighted = isColumnHeaderHighlighted(frame, table.id, column.id);
                   const headerStyle = isColumnHighlighted 
-                    ? 'padding: 5px 10px; border: 1px solid #eee; text-align: right; background-color: #ffc107;' 
-                    : 'padding: 5px 10px; border: 1px solid #eee; text-align: right; background-color: #f2f2f2;';
+                    ? 'padding: 5px 10px; border: 1px solid #eee; text-align: right; background-color: #E3F2FD; color: #0D47A1;' 
+                    : 'padding: 5px 10px; border: 1px solid #eee; text-align: right; background-color: #0D47A1; color: white;';
                   
                   return `
                     <th style="${headerStyle}">
@@ -161,7 +165,7 @@ const renderTablesToHTML = (tables: Table[], frame: AnimationFrame): string => {
               ${table.rows.map((row, rowIndex) => {
                 const isRowHighlighted = isHighlightedRow(frame, table.id, row.id);
                 const rowStyle = isRowHighlighted 
-                  ? 'background-color: #ffc107;' 
+                  ? 'background-color: #E3F2FD;' 
                   : rowIndex % 2 === 0 ? 'background-color: #fff;' : 'background-color: #f7f7f7;';
                 
                 return `
@@ -169,7 +173,7 @@ const renderTablesToHTML = (tables: Table[], frame: AnimationFrame): string => {
                     ${table.columns.map(column => {
                       const isCellHighlighted = isHighlightedCell(frame, table.id, column.id, row.id);
                       const cellStyle = isCellHighlighted 
-                        ? 'padding: 5px 10px; border: 1px solid #eee; text-align: right; background-color: #ffc107;' 
+                        ? 'padding: 5px 10px; border: 1px solid #eee; text-align: right; background-color: #E3F2FD;' 
                         : 'padding: 5px 10px; border: 1px solid #eee; text-align: right;';
                       
                       return `

@@ -82,8 +82,8 @@ const App = () => {
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Typography variant="h3" component="h1" gutterBottom sx={{ mb: 4, fontWeight: 'bold' }}>
-        SQL Visualizer
+      <Typography variant="h3" component="h1" gutterBottom sx={{ mb: 4, fontWeight: 'bold', color: '#0D47A1' }}>
+        Simple SQL Visualizer
       </Typography>
       
       <Grid container spacing={3}>
@@ -140,7 +140,7 @@ const App = () => {
       
       <Box sx={{ mt: 6, pt: 3, borderTop: '1px solid #e2e8f0', textAlign: 'center' }}>
         <Typography variant="body2" color="text.secondary">
-          SQL Visualizer - Open Source Project
+        The project is Open Source and first version was done by <a href="https://github.com/cherepashchuka"><strong>Andrei Cherepashchuk</strong></a>
         </Typography>
       </Box>
     </Container>

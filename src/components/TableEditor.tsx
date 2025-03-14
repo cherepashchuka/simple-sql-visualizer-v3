@@ -57,7 +57,7 @@ const TableNameInput = styled(TextField)(({ theme }) => ({
 
 const HeaderBox = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
-  backgroundColor: theme.palette.primary.main,
+  backgroundColor: '#0D47A1',
   color: theme.palette.primary.contrastText,
   display: 'flex',
   alignItems: 'center',
@@ -250,7 +250,7 @@ const TableEditor: React.FC<TableEditorProps> = ({ tables, setTables }) => {
         <HeaderBox>
           <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center' }}>
             <TableChartIcon sx={{ mr: 1 }} />
-            Table Editor
+            Tables
           </Typography>
         </HeaderBox>
         
@@ -278,6 +278,14 @@ const TableEditor: React.FC<TableEditorProps> = ({ tables, setTables }) => {
                     startIcon={<TableChartIcon />}
                     onClick={addTable}
                     disabled={!newTableName.trim()}
+                    sx={{
+                      backgroundColor: '#0D47A1',
+                      color: '#fff',
+                      fontWeight: 'bold',
+                      '&:hover': {
+                        backgroundColor: '#0A3882'
+                      }
+                    }}
                   >
                     Add Table
                   </Button>
