@@ -22,7 +22,20 @@ export interface HighlightAction {
   columnId?: string;
 }
 
-export type Action = HighlightAction;
+export interface AddColumnAction {
+  type: 'addColumn';
+  tableId: string;
+  columnName: string;
+  cellValues?: { [rowIndex: number]: string };
+}
+
+export interface AddRowAction {
+  type: 'addRow';
+  tableId: string;
+  cellValues: string[];
+}
+
+export type Action = HighlightAction | AddColumnAction | AddRowAction;
 
 export interface AnimationFrame {
   tables: Table[];

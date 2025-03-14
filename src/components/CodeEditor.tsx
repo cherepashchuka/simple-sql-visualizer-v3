@@ -34,8 +34,10 @@ interface CodeEditorProps {
 const CodeEditor: React.FC<CodeEditorProps> = ({ code, setCode, onExecute }) => {
   const sampleCode = `// Example code - try running this with your tables
 highlight in table 'users' row 1;
-highlight in table 'users' column 'name';
-highlight in table 'users' column 'email' row 2;`;
+add in table 'users' column 'status';
+add in table 'users' column 'score' cells [{1-'85'} {2-'92'}];
+add in table 'users' row [{John} {john@example.com} {Active} {78}];
+highlight in table 'users' column 'status';`;
 
   const theme = useTheme();
 
@@ -64,6 +66,9 @@ highlight in table 'users' column 'email' row 2;`;
             <li><Typography component="code" sx={{ fontFamily: 'monospace' }}>highlight in table 'tablename' row 1,2,3;</Typography> ⎯ highlight specific rows.</li>
             <li><Typography component="code" sx={{ fontFamily: 'monospace' }}>highlight in table 'tablename' column 'columnname';</Typography> ⎯ highlight a column.</li>
             <li><Typography component="code" sx={{ fontFamily: 'monospace' }}>highlight in table 'tablename' column 'columnname' row 1;</Typography> ⎯ highlight a specific cell.</li>
+            <li><Typography component="code" sx={{ fontFamily: 'monospace' }}>add in table 'tablename' column 'columnname';</Typography> ⎯ add a new column with empty cells.</li>
+            <li><Typography component="code" sx={{ fontFamily: 'monospace' }}>{"add in table 'tablename' column 'columnname' cells [{1-'value'} {2-'value'}];"}</Typography> ⎯ add a column with specific values.</li>
+            <li><Typography component="code" sx={{ fontFamily: 'monospace' }}>{"add in table 'tablename' row [{value1} {value2} {value3}];"}</Typography> ⎯ add a new row with values.</li>
           </Box>
           <Divider sx={{ my: 1 }} />
           <Typography variant="body2">
@@ -113,7 +118,7 @@ highlight in table 'users' column 'email' row 2;`;
               }
             }}
           >
-            Generate GIF
+            Execute and Generate Animation
           </Button>
         </Box>
       </Box>

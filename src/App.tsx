@@ -258,11 +258,17 @@ const App = () => {
               tables={tables}
               animationFrames={[
                 { tableId: '', rowIds: [], columnId: '' }, // Empty first frame
-                ...actions.map(action => ({
-                  tableId: action.type === 'highlight' ? action.tableId : '',
-                  rowIds: action.type === 'highlight' ? action.rowIds : [],
-                  columnId: action.type === 'highlight' ? action.columnId : ''
-                }))
+                ...actions.map(action => {
+                  if (action.type === 'highlight') {
+                    return {
+                      tableId: action.tableId,
+                      rowIds: action.rowIds,
+                      columnId: action.columnId
+                    };
+                  }
+                  // For add column and add row actions, don't highlight anything
+                  return { tableId: '', rowIds: [], columnId: '' };
+                })
               ]}
               currentFrameIndex={currentFrameIndex}
               gifUrl={gifUrl}

@@ -1,4 +1,5 @@
-import { Table, Action, HighlightAction } from '../types';
+import { Table, Action, HighlightAction, AddColumnAction, AddRowAction } from '../types';
+import { v4 as uuidv4 } from 'uuid';
 
 export const parseCode = (code: string, tables: Table[]): Action[] => {
   if (!code.trim()) return [];
@@ -72,6 +73,99 @@ const parseLine = (line: string, tables: Table[]): Action | null => {
       
       return action;
     }
+  }
+  
+  // Parsing logic for add column command
+  const addColumnMatch = line.match(/^add\s+in\s+table\s+['"](.+?)['"]\s+column\s+['"](.+?)['"](?:\s+cells\s+(.+))?$/i);
+  
+  if (addColumnMatch) {
+    const tableName = addColumnMatch[1];
+    const table = tables.find(t => t.name === tableName);
+    
+    if (!table) {
+      console.error(`Table '${tableName}' not found`);
+      return null;
+    }
+    
+    const columnName = addColumnMatch[2];
+    
+    // Check if column already exists
+    if (table.columns.some(col => col.name === columnName)) {
+      console.error(`Column '${columnName}' already exists in table '${tableName}'`);
+      return null;
+    }
+    
+    const action: AddColumnAction = {
+      type: 'addColumn',
+      tableId: table.id,
+      columnName
+    };
+    
+    // If cell values are specified
+    if (addColumnMatch[3]) {
+      const cellsMatch = addColumnMatch[3].match(/\[\s*({.+}(?:\s*{.+})*)\s*\]/i);
+      if (cellsMatch) {
+        const cellsStr = cellsMatch[1];
+        const cellMatches = [...cellsStr.matchAll(/{(\d+)-['"](.+?)['"]}/g)];
+        
+        if (cellMatches.length > 0) {
+          action.cellValues = {};
+          
+          for (const match of cellMatches) {
+            const rowIndex = parseInt(match[1]) - 1; // Convert to 0-indexed
+            const value = match[2];
+            
+            if (rowIndex >= 0 && rowIndex < table.rows.length) {
+              action.cellValues[rowIndex] = value;
+            } else {
+              console.warn(`Row index ${rowIndex + 1} is out of bounds for table '${tableName}'`);
+            }
+          }
+        }
+      }
+    }
+    
+    return action;
+  }
+  
+  // Parsing logic for add row command
+  const addRowMatch = line.match(/^add\s+in\s+table\s+['"](.+?)['"]\s+row\s+\[\s*({.+}(?:\s*{.+})*)\s*\]$/i);
+  
+  if (addRowMatch) {
+    const tableName = addRowMatch[1];
+    const table = tables.find(t => t.name === tableName);
+    
+    if (!table) {
+      console.error(`Table '${tableName}' not found`);
+      return null;
+    }
+    
+    if (table.columns.length === 0) {
+      console.error(`Cannot add row to table '${tableName}' with no columns`);
+      return null;
+    }
+    
+    const cellsStr = addRowMatch[2];
+    // Improved regex to properly capture all cell values without quotes
+    const cellMatches = [...cellsStr.matchAll(/{([^{}]*)}/g)];
+    
+    const action: AddRowAction = {
+      type: 'addRow',
+      tableId: table.id,
+      cellValues: []
+    };
+    
+    // Extract cell values and trim whitespace
+    for (const match of cellMatches) {
+      action.cellValues.push(match[1].trim());
+    }
+    
+    // Fill in missing values with empty strings
+    while (action.cellValues.length < table.columns.length) {
+      action.cellValues.push('');
+    }
+    
+    return action;
   }
   
   console.error(`Invalid command: ${line}`);
